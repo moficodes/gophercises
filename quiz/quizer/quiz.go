@@ -11,68 +11,86 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
-// quiz is the struct to hold quiz question and answer
-type quiz struct {
+// problem is the struct to hold problem question and answer
+type problem struct {
 	question string
 	answer   string
 }
 
-// StartQuiz controls the quiz game
+// StartQuiz controls the problem game
 func StartQuiz(file string, questions int, timelimit int) {
-	quizes := parseFile(file)
+	problems := parseFile(file)
 
 	scanner := bufio.NewScanner(os.Stdin)
 
 	correct := 0
 	fmt.Println("Press [Enter] to begin")
+	for scanner.Scan() {
+		break
+	}
+
+	answerCh := make(chan string)
+
+	timer := time.NewTimer(time.Duration(timelimit) * time.Second)
 
 	for i := 0; i < questions; i++ {
-		index := getQuestion(&quizes)
-		q := quizes[index]
+		index := getQuestion(&problems)
+		q := problems[index]
 		printQuestion(q)
-		quizes = append(quizes[:index], quizes[index+1:]...)
-		fmt.Println(len(quizes))
-		s := getUserInput(scanner)
-		if s == q.answer {
-			fmt.Println("Correct")
-			correct++
-		} else {
-			fmt.Println("Incorrect")
+		problems = append(problems[:index], problems[index+1:]...)
+		go getUserInput(scanner, answerCh)
+		select {
+		case <-timer.C:
+			result(correct, questions)
+			return
+		case answer := <-answerCh:
+			if isCorrect(answer, q.answer) {
+				correct++
+			}
 		}
 	}
+
+	result(correct, questions)
 }
 
-func getUserInput(scanner *bufio.Scanner) (s string) {
+func result(correct int, total int) {
+	ratio := (float32(correct) / float32(total)) * 100
+	fmt.Printf("\nYou got %d correct out of %d questions. \nYour score is %.2f%% \n", correct, total, ratio)
+}
+
+func getUserInput(scanner *bufio.Scanner, ans chan string) {
+	var s string
 	for scanner.Scan() {
 		s = processString(scanner.Text())
 		break
 	}
-	return
+	ans <- s
 }
 
 func processString(s string) string {
 	return strings.ToLower(strings.TrimSpace(s))
 }
 
-func printQuestion(q quiz) {
-	fmt.Printf("What is %s", q.question)
+func printQuestion(q problem) {
+	fmt.Printf("What is %s : ", q.question)
 }
 
-// GetQuestion Returns a single quiz to user
+// GetQuestion Returns a single problem to user
 // Remove the question that was just asked
-func getQuestion(quizes *[]quiz) int {
-	return rand.Intn(len(*quizes))
+func getQuestion(problems *[]problem) int {
+	return rand.Intn(len(*problems))
 }
 
 // Check if a answer is correct
-func isCorrect(answer string, question quiz) bool {
-	return answer == question.answer
+func isCorrect(given string, expected string) bool {
+	return given == expected
 }
 
-func parseFile(file string) []quiz {
-	var quizes []quiz
+func parseFile(file string) []problem {
+	var problems []problem
 	data, err := ioutil.ReadFile("problems.csv")
 	if err != nil {
 		log.Panic("Problem Reading FILE")
@@ -87,7 +105,7 @@ func parseFile(file string) []quiz {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		quizes = append(quizes, quiz{question: processString(record[0]), answer: processString(record[1])})
+		problems = append(problems, problem{question: processString(record[0]), answer: processString(record[1])})
 	}
-	return quizes
+	return problems
 }
