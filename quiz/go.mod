@@ -1,1 +1,1 @@
-module github.com/moficodes/quiz
+module github.com/moficodes/gophercises/quiz

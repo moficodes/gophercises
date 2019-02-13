@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/moficodes/quiz/quizer"
+	"github.com/moficodes/gophercises/quiz/quizer"
 )
 
 var quizTime int
