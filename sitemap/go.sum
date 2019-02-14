@@ -1,1 +1,5 @@
 github.com/moficodes/gophercises v0.0.0-20190213231112-75e00b1a044b h1:BoYIzuG2enhKCMRGY1SdZdqCZ8J9nntSDACqnoIyZQA=
+github.com/moficodes/gophercises/link v0.0.0-20190213232214-597b375cb260 h1:0ZuaPA0pUtM8qJ285dFF7dix3jBwkJ8B9cquhn3HaLk=
+github.com/moficodes/gophercises/link v0.0.0-20190213232214-597b375cb260/go.mod h1:Pv3Svvjllm3SrHL4fr3ugWyoG78+z0YO+ew32XaH88s=
+golang.org/x/net v0.0.0-20190213061140-3a22650c66bd h1:HuTn7WObtcDo9uEEU7rEqL0jYthdXAmZ6PP+meazmaU=
+golang.org/x/net v0.0.0-20190213061140-3a22650c66bd/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
