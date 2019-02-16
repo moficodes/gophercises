@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/moficodes/gophercises/task/db"
+
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +22,22 @@ var doCmd = &cobra.Command{
 				ids = append(ids, id)
 			}
 		}
-		fmt.Println(ids)
+		tasks, err := db.AllTasks()
+		if err != nil {
+			fmt.Println("Something wen wrong : ", err)
+		}
+		for _, id := range ids {
+			if id <= 0 || id > len(tasks) {
+				continue
+			}
+			task := tasks[id-1]
+			err := db.DeleteTask(task.Key)
+			if err != nil {
+				fmt.Printf("Failed to mark \"%d\" as complete. Error: %s\n", id, err)
+			}
+			fmt.Printf("Task %s marked complete\n", task.Value)
+		}
+
 	},
 }
 
